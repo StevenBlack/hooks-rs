@@ -12,18 +12,22 @@ trait Hookable<T>: HookStorage<T> {
     (true, value)
   }
 
+  fn post_process(&self, value: T) -> T {
+    value
+  }
+
   fn process(&self, value: T) -> T {
     let (should_process, value) = self.pre_process(value);
     if should_process {
       let value = self.execute(value);
-      self.process_next(value)
+      self.post_process(self.process_next(value))
     } else {
-      self.process_next(value)
+      self.post_process(self.process_next(value))
     }
   }
-  
+
   fn execute(&self, value: T) -> T;
-  
+
   fn sethook(&mut self, hook: Box<dyn Hookable<T>>) {
     match self.hook_mut() {
       Some(existing_hook) => existing_hook.sethook(hook),
@@ -76,11 +80,14 @@ fn main() {
     fn execute(&self, value: String) -> String {
       format!("{}!", value)
     }
+    fn post_process(&self, value: String) -> String {
+      format!("{} {}", value, "✅")
+    }
   }
 
   let mut hook1 = TrimHook { hook: None };
   let hook2 = AppendHook { hook: None };
   hook1.sethook(Box::new(hook2));
 
-  println!("Result: {}", hook1.process("  hello world!  ".to_string()));
+  println!("Result: {}", hook1.process("  hello world  ".to_string()));
 }
