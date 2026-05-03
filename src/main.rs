@@ -1,13 +1,28 @@
-type Hook<T> = Option<Box<dyn Hookable<T>>>;
-type StringHook = Option<Box<dyn Hookable<String>>>;
+macro_rules! impl_string_hook_storage {
+  ($type:ty) => {
+    impl HookStorage<String> for $type {
+      fn hook(&self) -> &StringHook {
+        &self.hook
+      }
 
-trait HookStorage<T> {
+      fn hook_mut(&mut self) -> &mut StringHook {
+        &mut self.hook
+      }
+    }
+  };
+}
+mod hooks;
+
+pub type Hook<T> = Option<Box<dyn Hookable<T>>>;
+pub type StringHook = Option<Box<dyn Hookable<String>>>;
+
+pub trait HookStorage<T> {
   fn hook(&self) -> &Hook<T>;
   fn hook_mut(&mut self) -> &mut Hook<T>;
 }
 
 /// Trait for hookable objects
-trait Hookable<T>: HookStorage<T> {
+pub trait Hookable<T>: HookStorage<T> {
   fn pre_process(&self, value: T) -> (bool, T) {
     (true, value)
   }
@@ -45,45 +60,8 @@ trait Hookable<T>: HookStorage<T> {
   }
 }
 
-macro_rules! impl_string_hook_storage {
-  ($type:ty) => {
-    impl HookStorage<String> for $type {
-      fn hook(&self) -> &StringHook {
-        &self.hook
-      }
-
-      fn hook_mut(&mut self) -> &mut StringHook {
-        &mut self.hook
-      }
-    }
-  };
-}
-
 fn main() {
-  struct TrimHook {
-    hook: StringHook,
-  }
-  impl_string_hook_storage!(TrimHook);
-
-  impl Hookable<String> for TrimHook {
-    fn execute(&self, value: String) -> String {
-      value.trim().to_string()
-    }
-  }
-
-  struct AppendHook {
-    hook: StringHook,
-  }
-  impl_string_hook_storage!(AppendHook);
-
-  impl Hookable<String> for AppendHook {
-    fn execute(&self, value: String) -> String {
-      format!("{}!", value)
-    }
-    fn post_process(&self, value: String) -> String {
-      format!("{} {}", value, "✅")
-    }
-  }
+  use hooks::utilities::{AppendHook, TrimHook};
 
   let mut hook1 = TrimHook { hook: None };
   let hook2 = AppendHook { hook: None };
