@@ -1,7 +1,15 @@
 /// Our basic hook structure
-struct Hook<T> {
-  hook: Option<Box<dyn Hookable<T>>>,
-}
+// struct Hook<T> {
+//   hook: Option<Box<dyn Hookable<T>>>,
+// }
+//
+// impl<T> Hook<T> {
+//   fn new() -> Self {
+//     Self { hook: None }
+//   }
+// }
+
+type StringHook = Option<Box<dyn Hookable<String>>>;
 
 trait HookStorage<T> {
   fn hook(&self) -> &Option<Box<dyn Hookable<T>>>;
@@ -29,14 +37,28 @@ trait Hookable<T>: HookStorage<T> {
   }
 }
 
-macro_rules! impl_hook_storage {
-  ($type:ty, $t:ty) => {
-    impl HookStorage<$t> for $type {
-      fn hook(&self) -> &Option<Box<dyn Hookable<$t>>> {
+// macro_rules! impl_hook_storage {
+//   ($type:ty, $t:ty) => {
+//     impl HookStorage<$t> for $type {
+//       fn hook(&self) -> &Option<Box<dyn Hookable<$t>>> {
+//         &self.hook
+//       }
+//
+//       fn hook_mut(&mut self) -> &mut Option<Box<dyn Hookable<$t>>> {
+//         &mut self.hook
+//       }
+//     }
+//   };
+// }
+
+macro_rules! impl_string_hook_storage {
+  ($type:ty) => {
+    impl HookStorage<String> for $type {
+      fn hook(&self) -> &StringHook {
         &self.hook
       }
 
-      fn hook_mut(&mut self) -> &mut Option<Box<dyn Hookable<$t>>> {
+      fn hook_mut(&mut self) -> &mut StringHook {
         &mut self.hook
       }
     }
@@ -45,10 +67,10 @@ macro_rules! impl_hook_storage {
 
 fn main() {
   struct TrimHook {
-    hook: Option<Box<dyn Hookable<String>>>,
+    hook: StringHook,
   }
 
-  impl_hook_storage!(TrimHook, String);
+  impl_string_hook_storage!(TrimHook);
 
   impl Hookable<String> for TrimHook {
     fn process(&self, mut value: String) -> String {
@@ -58,10 +80,10 @@ fn main() {
   }
 
   struct AppendHook {
-    hook: Option<Box<dyn Hookable<String>>>,
+    hook: StringHook,
   }
 
-  impl_hook_storage!(AppendHook, String);
+  impl_string_hook_storage!(AppendHook);
 
   impl Hookable<String> for AppendHook {
     fn process(&self, mut value: String) -> String {
