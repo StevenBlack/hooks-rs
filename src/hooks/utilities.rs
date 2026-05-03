@@ -36,3 +36,27 @@ impl Hookable<String> for AppendHook {
     format!("{}!", value)
   }
 }
+
+#[cfg(test)]
+mod tests {
+  use super::*;
+  use crate::Hookable;
+
+  #[test]
+  fn trim_hook_removes_whitespace() {
+    let hook = TrimHook { hook: None };
+    assert_eq!(hook.process("  hello world  ".to_string()), "hello world");
+  }
+
+  #[test]
+  fn uppercase_hook_converts_to_uppercase() {
+    let hook = UppercaseHook { hook: None };
+    assert_eq!(hook.process("hello world".to_string()), "HELLO WORLD");
+  }
+
+  #[test]
+  fn append_hook_appends_exclamation_and_checkmark() {
+    let hook = AppendHook { hook: None };
+    assert_eq!(hook.process("hello".to_string()), "hello! ✅");
+  }
+}
