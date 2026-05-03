@@ -12,6 +12,7 @@ impl Hookable<String> for TrimHook {
   }
 }
 
+/// A hook that uppercases the input string
 pub struct UppercaseHook {
   pub hook: StringHook,
 }
@@ -23,6 +24,7 @@ impl Hookable<String> for UppercaseHook {
   }
 }
 
+/// A hook that appends a checkmark and exclamation to the input string
 pub struct AppendHook {
   pub hook: StringHook,
 }
