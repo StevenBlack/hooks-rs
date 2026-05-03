@@ -10,7 +10,7 @@ trait HookStorage<T> {
 
 /// Trait for hookable objects
 trait Hookable<T>: HookStorage<T> {
-    fn execute(&self, value: T) -> T;
+    fn process(&self, value: T) -> T;
 
     fn sethook(&mut self, hook: Box<dyn Hookable<T>>) {
         match self.hook_mut() {
@@ -21,9 +21,9 @@ trait Hookable<T>: HookStorage<T> {
         }
     }
 
-    fn execute_next(&self, value: T) -> T {
+    fn process_next(&self, value: T) -> T {
         match self.hook() {
-            Some(next_hook) => next_hook.execute(value),
+            Some(next_hook) => next_hook.process(value),
             None => value,
         }
     }
@@ -51,9 +51,9 @@ fn main() {
     impl_hook_storage!(TrimHook, String);
 
     impl Hookable<String> for TrimHook {
-        fn execute(&self, mut value: String) -> String {
+        fn process(&self, mut value: String) -> String {
             value = value.trim().to_string();
-            self.execute_next(value)
+            self.process_next(value)
         }
     }
 
@@ -64,9 +64,9 @@ fn main() {
     impl_hook_storage!(AppendHook, String);
 
     impl Hookable<String> for AppendHook {
-        fn execute(&self, mut value: String) -> String {
+        fn process(&self, mut value: String) -> String {
             value.push_str("!");
-            self.execute_next(value)
+            self.process_next(value)
         }
     }
 
@@ -74,5 +74,5 @@ fn main() {
     let hook2 = AppendHook {hook: None};
     hook1.sethook(Box::new(hook2));
 
-    println!("Result: {}", hook1.execute("  hello ".to_string()));
+    println!("Result: {}", hook1.process("  hello ".to_string()));
 }
