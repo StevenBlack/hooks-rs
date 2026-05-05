@@ -32,10 +32,24 @@ impl_string_hook_storage!(AppendHook);
 
 impl Hookable<String> for AppendHook {
   fn post_process(&self, value: String) -> String {
-    format!("{} {}", value, "✅")
+    format!("{} {}", value, "(✅ added in post-process)")
   }
   fn execute(&self, value: String) -> String {
     format!("{}!", value)
+  }
+}
+
+/// A hook that prints the currently hooked string to stdout
+pub struct PrintHook {
+  pub hook: StringHook,
+  pub name: Option<String>,
+}
+impl_string_hook_storage!(PrintHook);
+impl Hookable<String> for PrintHook {
+  fn execute(&self, value: String) -> String {
+    let name = self.name.as_ref().unwrap_or(&"PrintHook".to_string()).to_owned();
+    println!("{}: {}", name, value);
+    value
   }
 }
 

@@ -1,3 +1,37 @@
+/// Implements the `HookStorage<String>`
+/// trait for a given type. This macro generates the required methods to manage
+/// `StringHook` storage through immutable and mutable references.
+///
+/// # Parameters
+/// - `$type`: The type for which the `HookStorage<String>` trait will be implemented.
+///
+/// # Generated Trait Implementation
+/// - `fn hook(&self) -> &StringHook`:
+///   Returns an immutable reference to the `hook` field of the provided type.
+/// - `fn hook_mut(&mut self) -> &mut StringHook`:
+///   Returns a mutable reference to the `hook` field of the provided type.
+///
+/// This macro assumes the type `$type` has a field named `hook` of type `StringHook`.
+///
+/// # Example
+/// ```rust
+/// use your_crate::HookStorage;
+/// use your_crate::StringHook;
+///
+/// struct MyStruct {
+///     hook: StringHook,
+/// }
+///
+/// impl_string_hook_storage!(MyStruct);
+///
+/// let mut my_instance = MyStruct { hook: StringHook::new() };
+///
+/// // Access the hook immutably
+/// let hook_ref: &StringHook = my_instance.hook();
+///
+/// // Access the hook mutably
+/// let hook_mut_ref: &mut StringHook = my_instance.hook_mut();
+/// ```
 macro_rules! impl_string_hook_storage {
   ($type:ty) => {
     impl HookStorage<String> for $type {
@@ -61,12 +95,14 @@ pub trait Hookable<T>: HookStorage<T> {
 }
 
 fn main() {
-  use hooks::utilities::{AppendHook, TrimHook, UppercaseHook};
+  use hooks::utilities::{AppendHook, TrimHook, UppercaseHook, PrintHook};
 
   let mut hook1 = TrimHook { hook: None };
   let hook2 = AppendHook { hook: None };
   let hook3 = UppercaseHook { hook: None };
+  let hook4 = PrintHook { hook: None, name: Some("Print hook 123".to_string()) };
   hook1.sethook(Box::new(hook2));
+  hook1.sethook(Box::new(hook4));
   hook1.sethook(Box::new(hook3));
 
   println!("Result: {}", hook1.process("  hello world  ".to_string()));
