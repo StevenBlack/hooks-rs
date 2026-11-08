@@ -47,7 +47,11 @@ pub struct PrintHook {
 impl_string_hook_storage!(PrintHook);
 impl Hookable<String> for PrintHook {
   fn execute(&self, value: String) -> String {
-    let name = self.name.as_ref().unwrap_or(&"PrintHook".to_string()).to_owned();
+    let name = self
+      .name
+      .as_ref()
+      .unwrap_or(&"PrintHook".to_string())
+      .to_owned();
     println!("{}: {}", name, value);
     value
   }

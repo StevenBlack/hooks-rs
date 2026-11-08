@@ -95,12 +95,15 @@ pub trait Hookable<T>: HookStorage<T> {
 }
 
 fn main() {
-  use hooks::utilities::{AppendHook, TrimHook, UppercaseHook, PrintHook};
+  use hooks::utilities::{AppendHook, PrintHook, TrimHook, UppercaseHook};
 
   let mut hook1 = TrimHook { hook: None };
   let hook2 = AppendHook { hook: None };
   let hook3 = UppercaseHook { hook: None };
-  let hook4 = PrintHook { hook: None, name: Some("Print hook 123".to_string()) };
+  let hook4 = PrintHook {
+    hook: None,
+    name: Some("Print hook 123".to_string()),
+  };
   hook1.sethook(Box::new(hook2));
   hook1.sethook(Box::new(hook4));
   hook1.sethook(Box::new(hook3));
