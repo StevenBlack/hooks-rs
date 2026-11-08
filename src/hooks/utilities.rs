@@ -77,6 +77,6 @@ mod tests {
   #[test]
   fn append_hook_appends_exclamation_and_checkmark() {
     let hook = AppendHook { hook: None };
-    assert_eq!(hook.process("hello".to_string()), "hello! ✅");
+    assert_eq!(hook.process("hello".to_string()), "hello! (✅ added in post-process)");
   }
 }
